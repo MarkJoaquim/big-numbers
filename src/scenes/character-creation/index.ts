@@ -1,22 +1,19 @@
-import { GameObjects, Geom, Scene } from 'phaser';
+import { GameObjects, Scene } from 'phaser';
+import { ChevronButton, TextButton, TextInput } from '../../classes/ui';
 import { Cosmetic } from '../../classes/cosmetic';
 import random from '../../helpers/random';
 import { AbilityName, EquipmentType, GameData, WeaponType } from '../../storageTypes';
 
 export class CharacterCreationScene extends Scene {
     private model!: Phaser.GameObjects.Container;
-    private name!: Phaser.GameObjects.BitmapText;
+    private name!: TextInput;
     private allBodyNames: string[] = ['player-body-white', 'player-body-brown', 'player-body-blackish', 'player-body-black'];
     private allHeadNames: string[] = ['head-blonde', 'head-brown', 'head-black', 'head-blonde-long'];
     private currentCosmeticSelection!: {
         body: number,
         head: number
     };
-    private graphics!: GameObjects.Graphics;
-    private buttons!: {
-        polygon: Geom.Polygon,
-        click: () => void
-    }[]
+    private buttons!: (GameObjects.GameObject|GameObjects.Group)[];
 
     constructor() {
         super('character-creation');
@@ -24,24 +21,13 @@ export class CharacterCreationScene extends Scene {
 
     create() {
         this.initModel();
-        this.initName();
+        this.initTextInput();
         this.initCamera();
         this.initButtons();
-        this.input.keyboard.on('keydown', this.handleKey, this);
-        this.input.on('pointerdown', this.handleClick, this);
     }
 
-    update() {
-        
-        this.input.activePointer.updateWorldPoint(this.cameras.main);
-        const x = this.input.activePointer.worldX;
-        const y = this.input.activePointer.worldY;
-        this.drawButtons(x, y);
-        
-    }
-
-    private initName(): void {
-        this.name = new GameObjects.BitmapText(this, 0, 200, 'dogicapixel', '', 32, 0.5);
+    private initTextInput(): void {
+        this.name = new TextInput(this, 0, 180, 32, (name) => this.createCharacter(name));
         this.add.existing(this.name);
     }
 
@@ -58,46 +44,33 @@ export class CharacterCreationScene extends Scene {
     }
 
     private initButtons(): void {
-        this.graphics = new GameObjects.Graphics(this)
-        this.add.existing(this.graphics);
+        const textButton = new TextButton(this, 0, 250, 'Create', 16, () => this.createCharacter(this.name.getText()))
+        textButton.centerX(0);
         this.buttons = [
-            { polygon: new Geom.Polygon([-250, 100, -200, 75, -200, 125]), click: () => this.currentCosmeticSelection.body-- },
-            { polygon: new Geom.Polygon([250, 100, 200, 75, 200, 125]), click: () => this.currentCosmeticSelection.body++ },
-            { polygon: new Geom.Polygon([-250, -100, -200, -75, -200, -125]), click: () => this.currentCosmeticSelection.head-- },
-            { polygon: new Geom.Polygon([250, -100, 200, -75, 200, -125]), click: () => this.currentCosmeticSelection.head++ }
-        ]
-        this.drawButtons();
+            new ChevronButton(this, 250, 100, 50, true, () => this.switchBody(1)),
+            new ChevronButton(this, -250, 100, 50, false, () => this.switchBody(-1)),
+            new ChevronButton(this, 250, -100, 50, true, () => this.switchHead(1)),
+            new ChevronButton(this, -250, -100, 50, false, () => this.switchHead(-1)),
+            textButton
+        ];
     }
 
-    private drawButtons(x?: number, y?: number): void {
-        this.buttons.map(b => {
-            if (x && y && b.polygon.contains(x, y)) {
-                this.graphics.fillStyle(0xAAAAAA);
-            } else {
-                this.graphics.fillStyle(0x888888);
-            }
-            this.graphics.fillPoints(b.polygon.points, true)
-        });
+    private switchHead(amount: number): void {
+        this.currentCosmeticSelection.head = (this.currentCosmeticSelection.head + amount + this.allHeadNames.length) % this.allHeadNames.length;
+        this.updateModel();
     }
 
-    private handleKey(event: any): void {
-        if (event.keyCode === 8 && this.name.text.length > 0) {
-            this.name.text = this.name.text.slice(0, this.name.text.length - 1);
-        } else if (event.keyCode === 32 || (event.keyCode >= 48 && event.keyCode < 90)) {
-            this.name.text += event.key;
-        } else if (event.key === 'Enter' && this.name.text.length > 0) {
-            const gameData = this.createStartingGameData()
+    private switchBody(amount: number): void {
+        this.currentCosmeticSelection.body = (this.currentCosmeticSelection.body + amount + this.allBodyNames.length) % this.allBodyNames.length;
+        this.updateModel();
+    }
+
+    private createCharacter(name: string): void {
+        if (name) {
+            const gameData = this.createStartingGameData(name)
             this.scene.start('training-ground-scene', gameData);
             this.scene.start('ui-scene', gameData);
         }
-        this.name.x = -this.name.width/2;
-    }
-
-    private handleClick(pointer: Phaser.Input.Pointer): void {
-        this.buttons.find(b => b.polygon.contains(pointer.worldX, pointer.worldY))?.click()
-        this.currentCosmeticSelection.body = (this.currentCosmeticSelection.body + this.allBodyNames.length) % this.allBodyNames.length;
-        this.currentCosmeticSelection.head = (this.currentCosmeticSelection.head + this.allHeadNames.length) % this.allHeadNames.length;
-        this.updateModel();
     }
 
     private randomizeCosmetics(): void {
@@ -116,11 +89,11 @@ export class CharacterCreationScene extends Scene {
         ]);
     }
 
-    private createStartingGameData(): GameData {
+    private createStartingGameData(name: string): GameData {
         return {
             mapName: 'simple-map',
             playerConfig: {
-                name: this.name.text,
+                name: name,
                 level: 1,
                 exp: 0,
                 cosmetics: [
@@ -193,23 +166,28 @@ export class CharacterCreationScene extends Scene {
                 ],
                 abilityBindings: [
                     {
-                        keyCode: 'Q',
+                        keyCode: 81,
+                        keyName: 'q',
                         abilityName: AbilityName.Punch
                     },
                     {
-                        keyCode: 'W',
+                        keyCode: 87,
+                        keyName: 'w',
                         abilityName: AbilityName.Slash
                     },
                     {
-                        keyCode: 'E',
+                        keyCode: 69,
+                        keyName: 'e',
                         abilityName: AbilityName.Shoot
                     },
                     {
-                        keyCode: 'R',
+                        keyCode: 82,
+                        keyName: 'r',
                         abilityName: AbilityName.Magic
                     },
                     {
-                        keyCode: 'SPACE',
+                        keyCode: 32,
+                        keyName: ' ',
                         abilityName: AbilityName.FlashJump
                     }
                 ],

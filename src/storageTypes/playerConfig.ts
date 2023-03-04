@@ -1,4 +1,4 @@
-import { AbilityName, CosmeticConfig, EquipmentConfig, ItemConfig } from ".";
+import { AbilityBinding, CosmeticConfig, EquipmentConfig, ItemConfig } from ".";
 
 export interface PlayerConfig {
     name: string,
@@ -7,9 +7,6 @@ export interface PlayerConfig {
     cosmetics: CosmeticConfig[],
     equipment: EquipmentConfig[],
     weapons: EquipmentConfig[],
-    abilityBindings: {
-        abilityName: AbilityName,
-        keyCode?: string
-    }[],
+    abilityBindings: AbilityBinding[],
     inventory: ItemConfig[]
 }

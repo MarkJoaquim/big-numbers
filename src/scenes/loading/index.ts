@@ -12,6 +12,8 @@ export class LoadingScene extends Scene {
         this.gameData = this.loadData()
         this.load.baseURL = 'assets/';
 
+        this.game.input.setDefaultCursor('url(assets/cursors/cursor.cur), pointer');
+
         // PLAYER LOADING
         // Load Bodies
         this.load.atlas('player-body-white', 'spritesheets/player-body-white.png', 'spritesheets/player-body.json');
@@ -37,6 +39,7 @@ export class LoadingScene extends Scene {
         this.load.bitmapFont('dogicapixel', 'fonts/dogicapixel.png', 'fonts/dogicapixel.xml');
 
         // Skills Loading
+        this.load.atlas('ability-thumbnails', 'spritesheets/ability-thumbnails.png', 'spritesheets/ability-thumbnails.json');
         this.load.atlas('flash-jump', 'spritesheets/flash-jump.png', 'spritesheets/flash-jump.json');
 
         // MAP LOADING

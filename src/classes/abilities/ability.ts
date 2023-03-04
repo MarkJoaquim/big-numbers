@@ -1,30 +1,25 @@
 import { Geom } from "phaser";
-import { WeaponType } from "../../storageTypes";
+import { AbilityBinding, AbilityName, WeaponType } from "../../storageTypes";
 import { TrainingGround } from "../../scenes";
 import { Mob } from "../mob";
 import { Player } from "../player";
 
 export class Ability {
-    public keyCode: string;
+    public keyCode: number;
+    public abilityName: AbilityName;
     protected player: Player;
     protected scene: TrainingGround;
     protected cooldown: number;
     protected lastUsed: number = 0;
     protected weaponType: WeaponType;
 
-    constructor(keyCode: string, player: Player, scene: TrainingGround, cooldown: number, weaponType?: WeaponType) {
-        this.keyCode = keyCode;
+    constructor(abilityBinding: AbilityBinding, player: Player, scene: TrainingGround, cooldown: number, weaponType?: WeaponType) {
+        this.keyCode = abilityBinding.keyCode!;
+        this.abilityName = abilityBinding.abilityName;
         this.player = player;
         this.scene = scene;
         this.cooldown = cooldown;
         this.weaponType = weaponType ? weaponType : WeaponType.Any;
-        this.scene.input.keyboard.on(`keydown-${keyCode}`, this.cast, this);
-    }
-
-    public updateKeyCode(keyCode: string): void {
-        this.keyCode = keyCode;
-        this.scene.input.keyboard.removeListener(`keydown-${this.keyCode}`);
-        this.scene.input.keyboard.on(`keydown-${keyCode}`, this.cast, this);
     }
 
     public cast(): void {}

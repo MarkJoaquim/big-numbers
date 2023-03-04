@@ -6,3 +6,9 @@ export enum AbilityName {
     Magic = 'magic',
     Shoot = 'shoot'
 }
+
+export interface AbilityBinding {
+    abilityName: AbilityName,
+    keyCode?: number,
+    keyName?: string
+}

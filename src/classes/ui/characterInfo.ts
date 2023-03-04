@@ -1,5 +1,5 @@
 import { GameObjects } from "phaser";
-import eventsCenter from '../../helpers/EventsCenter';
+import eventsCenter from '../../helpers/eventsCenter';
 import { EVENTS_NAME } from '../../consts';
 import { Scaling } from "../scaling";
 import { PlayerConfig } from "../../storageTypes";
@@ -57,7 +57,7 @@ export class CharacterInfo {
     public addExp(value: number): void {
         this.currentExp += value;
         if (this.currentExp >= this.expToNextLevel) {
-            eventsCenter.emit('level-up', this.currentLevel + 1);
+            eventsCenter.emit(EVENTS_NAME.LevelUp, this.currentLevel + 1);
             this.currentExp = this.currentExp % this.expToNextLevel;
             this.currentLevel++;
             this.expToNextLevel = Scaling.expToNextLevel(this.currentLevel);

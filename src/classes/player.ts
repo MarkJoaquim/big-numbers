@@ -1,8 +1,9 @@
 import { Input, Physics, Scene } from 'phaser';
-import eventsCenter from '../helpers/EventsCenter';
-import { getAbilityInstanceByName } from '../helpers/getAbilityInstanceByName';
+import { EVENTS_NAME } from '../consts';
+import eventsCenter from '../helpers/eventsCenter';
+import { getAbilityInstanceByBinding } from '../helpers/getAbilityInstanceByBinding';
 import { TrainingGround } from '../scenes';
-import { PlayerConfig, Stats, WeaponType } from '../storageTypes';
+import { AbilityBinding, PlayerConfig, Stats, WeaponType } from '../storageTypes';
 import { Ability } from './abilities/ability';
 import { Cosmetic } from './cosmetic';
 import { Equipment } from './equipment';
@@ -44,7 +45,7 @@ export class Player extends Phaser.GameObjects.Container {
 		this.cursor = this.scene.input.keyboard.createCursorKeys();
 		this.abilities = this.playerData.abilityBindings
 			.filter(ab => ab.keyCode !== undefined)
-			.map(ab => getAbilityInstanceByName(ab.abilityName, ab.keyCode!, this, this.scene as TrainingGround))
+			.map(ab => getAbilityInstanceByBinding(ab, this, this.scene as TrainingGround))
 			.filter(i => i !== undefined) as Ability[]; // remove abilities which failed to be constructed
 
 		// Physics
@@ -62,7 +63,9 @@ export class Player extends Phaser.GameObjects.Container {
 		this.initAnimations();
 
 		// Events
-		eventsCenter.on('level-up', this.levelUp, this);
+		eventsCenter.on(EVENTS_NAME.LevelUp, this.levelUp, this);
+		eventsCenter.on(EVENTS_NAME.BindingAltered, this.alterAbilityBinding, this)
+		scene.input.keyboard.on('keydown', (event: any) => this.abilities.find(a => a.keyCode === event.keyCode)?.cast());
 
 		// Add to scene
 		scene.add.existing(this);
@@ -120,6 +123,13 @@ export class Player extends Phaser.GameObjects.Container {
 	public levelUp(level: number) {
 		if (level === this.playerData.level + 1) {
 			this.playerData.level = level;
+		}
+	}
+
+	public alterAbilityBinding(ab: AbilityBinding) {
+		const alteredBinding = this.abilities.find(a => a.abilityName === ab.abilityName);
+		if (alteredBinding) {
+			alteredBinding.keyCode = ab.keyCode!;
 		}
 	}
 

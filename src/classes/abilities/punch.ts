@@ -1,12 +1,12 @@
 import { Ability } from "./ability";
 import { Player } from "../player";
 import { TrainingGround } from "../../scenes";
-import { WeaponType } from "../../storageTypes";
+import { AbilityBinding, WeaponType } from "../../storageTypes";
 
 export class Punch extends Ability {
 
-    constructor(keyCode: string, player: Player, scene: TrainingGround) {
-        super(keyCode, player, scene, 100, WeaponType.Any);
+    constructor(abilityBinding: AbilityBinding, player: Player, scene: TrainingGround) {
+        super(abilityBinding, player, scene, 100, WeaponType.Any);
     }
 
     public cast() {

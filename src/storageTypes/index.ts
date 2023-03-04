@@ -1,5 +1,5 @@
 export * from './playerConfig';
-export * from './abilityName';
+export * from './ability';
 export * from './cosmeticConfig';
 export * from './equipmentConfig';
 export * from './itemConfig';

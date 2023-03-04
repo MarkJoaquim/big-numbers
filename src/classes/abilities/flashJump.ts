@@ -2,16 +2,12 @@ import { GameObjects } from "phaser";
 import { TrainingGround } from "../../scenes";
 import { Ability } from "./ability";
 import { Player } from "../player";
-import { WeaponType } from "../../storageTypes";
+import { AbilityBinding, WeaponType } from "../../storageTypes";
 
 export class FlashJump extends Ability {
 
-    constructor(keyCode: string, player: Player, scene: TrainingGround) {
-        super(keyCode, player, scene, 250, WeaponType.Any);
-        // Special also listen for general jump command
-        if (keyCode != 'SPACE') {
-            this.scene.input.keyboard.on('keydown-SPACE', this.cast, this);
-        }
+    constructor(abilityBinding: AbilityBinding, player: Player, scene: TrainingGround) {
+        super(abilityBinding, player, scene, 250, WeaponType.Any);
         this.initAnimations();
     }
 

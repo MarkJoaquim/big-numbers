@@ -1,5 +1,5 @@
 import { Scene } from 'phaser';
-import eventsCenter from '../helpers/EventsCenter';
+import eventsCenter from '../helpers/eventsCenter';
 import { EVENTS_NAME } from '../consts';
 import { Actor } from './actor';
 import { Damage } from './damage';
