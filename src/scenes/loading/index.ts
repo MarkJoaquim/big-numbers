@@ -32,6 +32,9 @@ export class LoadingScene extends Scene {
         this.load.atlas('staff', 'spritesheets/staff.png', 'spritesheets/staff.json');
         this.load.atlas('bow', 'spritesheets/bow.png', 'spritesheets/bow.json');
 
+        // Load Projectiles
+        this.load.atlas('arrow', 'spritesheets/arrow.png', 'spritesheets/arrow.json');
+
         // Damage Loading
         this.load.bitmapFont('damage', 'fonts/damage.png', 'fonts/damage.xml');
 

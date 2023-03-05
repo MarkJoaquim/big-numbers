@@ -38,6 +38,22 @@ export class Ability {
         });
     }
 
+    protected filterMobsByPolygon (hitbox: Geom.Polygon) {
+        return this.scene.getMobs().filter((mob: Mob) => {
+                return hitbox.contains(mob.body.center.x, mob.body.center.y);
+        });
+    }
+
+    protected getNearestMob(mobs: Mob[]) {
+        const playerCenter = this.player.getBody().center;
+        return mobs.reduce((nearest: Mob | undefined, curr: Mob) => {
+            if (!nearest) return curr;
+            const distNearest = playerCenter.distance(nearest.body.center);
+            const distCurr = playerCenter.distance(curr.body.center);
+            return distNearest < distCurr ? nearest : curr;
+        }, undefined)
+    }
+
     protected offCooldown() {
         return this.lastUsed + this.cooldown * this.player.getCooldownMultiplier() < this.scene.time.now;
     }
